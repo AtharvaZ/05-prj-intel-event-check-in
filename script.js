@@ -8,7 +8,7 @@ let powerCount = 0;
 let attendees = [];
 
 // Maximum capacity for the event
-const maxCapacity = 50;
+const maxCapacity = 3;
 
 // Get references to all the DOM elements we need
 const checkInForm = document.getElementById("checkInForm");
@@ -52,7 +52,8 @@ function loadFromLocalStorage() {
 
     // Check if capacity was already reached
     if (totalCount >= maxCapacity) {
-      checkInBtn.disabled = true;
+      checkInBtn.classList.add("disabled-state");
+      checkInBtn.setAttribute("aria-disabled", "true");
       showCelebrationMessage();
     }
   }
@@ -103,6 +104,13 @@ function showCelebrationMessage() {
   greeting.className = "celebration-message";
 }
 
+// Function to show capacity warning
+function showCapacityWarning() {
+  greeting.textContent = `⚠️ Cannot check in! Event is at full capacity (${maxCapacity}/${maxCapacity}). No more attendees can be added.`;
+  greeting.style.display = "block";
+  greeting.className = "celebration-message";
+}
+
 // Function to render the attendee list
 function renderAttendeeList() {
   // Clear the current list
@@ -142,6 +150,15 @@ loadFromLocalStorage();
 checkInForm.addEventListener("submit", function (event) {
   // Prevent the default form submission
   event.preventDefault();
+
+  // Check if capacity has already been reached
+  if (totalCount >= maxCapacity) {
+    greeting.textContent = `⚠️ Cannot check in! Event is at full capacity (${maxCapacity}/${maxCapacity}). No more attendees can be added.`;
+    greeting.style.display = "block";
+    greeting.className = "celebration-message";
+    checkInForm.reset();
+    return;
+  }
 
   // Get the values from the form
   const name = attendeeName.value;
@@ -188,7 +205,8 @@ checkInForm.addEventListener("submit", function (event) {
 
   // Check if we've reached capacity
   if (totalCount >= maxCapacity) {
-    checkInBtn.disabled = true;
+    checkInBtn.classList.add("disabled-state");
+    checkInBtn.setAttribute("aria-disabled", "true");
     showCelebrationMessage();
   }
 });
